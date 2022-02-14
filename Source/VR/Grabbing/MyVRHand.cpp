@@ -2,6 +2,8 @@
 
 
 #include "MyVRHand.h"
+#include "../Grabbing/MyGrabber.h"
+#include "../Grabbing/MyGrabbablesProvider.h"
 #include "MotionControllerComponent.h"
 
 // Sets default values
@@ -15,6 +17,12 @@ AMyVRHand::AMyVRHand()
 
 	motionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController"));
 	motionController->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
+
+	grabber = CreateDefaultSubobject<UMyGrabber>("Grabber");
+	AddOwnedComponent(grabber);
+
+	grabbablesProvider = CreateDefaultSubobject<UMyGrabbablesProvider>("GrabbablesProvider");
+	AddOwnedComponent(grabbablesProvider);
 }
 
 // Called when the game starts or when spawned

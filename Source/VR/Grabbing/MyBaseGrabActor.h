@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "MyBaseGrabActor.generated.h"
 
+class UMyGrabbable;
+
 UCLASS()
 class VR_API AMyBaseGrabActor : public AActor
 {
@@ -25,6 +27,9 @@ public:
 
 
 public:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 		UStaticMeshComponent* staticMesh;
+
+	UPROPERTY(EditAnywhere)
+		UMyGrabbable* grabComponent;
 };

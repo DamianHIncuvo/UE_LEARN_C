@@ -2,6 +2,7 @@
 
 
 #include "MyBaseGrabActor.h"
+#include "../Grabbing/MyGrabbable.h"
 
 // Sets default values
 AMyBaseGrabActor::AMyBaseGrabActor()
@@ -9,10 +10,11 @@ AMyBaseGrabActor::AMyBaseGrabActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	staticMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("StaticMesh"));
+	staticMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
 	SetRootComponent(staticMesh);
 
-	staticMesh->SetCollisionProfileName("PhysicsActor");
+	grabComponent = CreateDefaultSubobject<UMyGrabbable>("GrabComponent");
+	AddOwnedComponent(grabComponent);
 }
 
 // Called when the game starts or when spawned

@@ -10,7 +10,8 @@
 #include "MyVRPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Grabbing/MyVRHand.h"
-#include "../Grabbing/MyGrabComponent.h"
+#include "../Grabbing/MyGrabbable.h"
+#include "../Grabbing/MyGrabber.h"
 #include "MotionControllerComponent.h"
 
 void AMyVRPlayerController::SetupInputComponent()
@@ -22,11 +23,6 @@ void AMyVRPlayerController::SetupInputComponent()
 
 	teleportProcessor = new InputTeleportProcessor(0.75f, 0.5f);
 	InputComponent->BindAxis("TeleportAxis", this, &AMyVRPlayerController::OnTeleportAxis);
-
-	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Pressed, this, &AMyVRPlayerController::OnLeftGrabInput);
-	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Released, this, &AMyVRPlayerController::OnLeftReleaseInput);
-	InputComponent->BindAction("GrabRight", EInputEvent::IE_Pressed, this, &AMyVRPlayerController::OnRightGrabInput);
-	InputComponent->BindAction("GrabRight", EInputEvent::IE_Released, this, &AMyVRPlayerController::OnRightReleaseInput);
 }
 
 void AMyVRPlayerController::BeginPlay()
@@ -37,6 +33,11 @@ void AMyVRPlayerController::BeginPlay()
 	rotateComponent = pawn->rotateComponent;
 	leftHand = pawn->leftHand;
 	rightHand = pawn->rightHand;
+
+	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Pressed, leftHand->grabber, &UMyGrabber::InputGrab);
+	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Released, this, &AMyVRPlayerController::OnLeftReleaseInput);
+	InputComponent->BindAction("GrabRight", EInputEvent::IE_Pressed, rightHand->grabber, &UMyGrabber::InputGrab);
+	InputComponent->BindAction("GrabRight", EInputEvent::IE_Released, this, &AMyVRPlayerController::OnRightReleaseInput);
 }
 
 void AMyVRPlayerController::OnRotateAxis(float inputValue)
@@ -76,6 +77,24 @@ void AMyVRPlayerController::OnTeleportAxis(float inputValue)
 
 void AMyVRPlayerController::OnLeftGrabInput()
 {
+	OnGrabInput(leftHand);
+}
+
+void AMyVRPlayerController::OnLeftReleaseInput()
+{
+}
+
+void AMyVRPlayerController::OnRightGrabInput()
+{
+	OnGrabInput(rightHand);
+}
+
+void AMyVRPlayerController::OnRightReleaseInput()
+{
+}
+
+void AMyVRPlayerController::OnGrabInput(AMyVRHand* hand)
+{
 	TArray<TEnumAsByte<EObjectTypeQuery>> objectTypes = TArray< TEnumAsByte<EObjectTypeQuery>>();
 	objectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody));
 
@@ -87,9 +106,9 @@ void AMyVRPlayerController::OnLeftGrabInput()
 
 	if (UKismetSystemLibrary::SphereTraceMultiForObjects(
 		GetWorld(),
-		leftHand->motionController->GetComponentLocation(),
-		leftHand->motionController->GetComponentLocation(),
-		leftHand->GrabRadiusFromGripPosition,
+		hand->motionController->GetComponentLocation(),
+		hand->motionController->GetComponentLocation(),
+		hand->GrabRadiusFromGripPosition,
 		objectTypes,
 		false,
 		actorsToIgnore,
@@ -102,13 +121,13 @@ void AMyVRPlayerController::OnLeftGrabInput()
 	{
 		float nearestComponentDistance = 1000000000.0f;
 
-		for(int i = 0; i < results.Num(); i++)
+		for (int i = 0; i < results.Num(); i++)
 		{
-			UActorComponent* grabbable = results.GetData()->Actor->GetComponentByClass(UMyGrabComponent::StaticClass());
+			UActorComponent* grabbable = results.GetData()->Actor->GetComponentByClass(UMyGrabbable::StaticClass());
 
 			if (grabbable != nullptr)
 			{
-				float newDistance = FVector::Distance(grabbable->GetOwner()->GetActorLocation(), leftHand->GetActorLocation());
+				float newDistance = FVector::Distance(grabbable->GetOwner()->GetActorLocation(), hand->GetActorLocation());
 				if (newDistance < nearestComponentDistance)
 				{
 					nearestComponentDistance = newDistance;
@@ -121,21 +140,9 @@ void AMyVRPlayerController::OnLeftGrabInput()
 	if (nearestgrabbableComponent == nullptr)
 		return;
 
-	UMyGrabComponent* grabComponent = Cast<UMyGrabComponent>(nearestgrabbableComponent);
-	if (grabComponent->TryGrab(leftHand->motionController))
+	UMyGrabbable* grabComponent = Cast<UMyGrabbable>(nearestgrabbableComponent);
+	if (grabComponent->TryGrab(hand->motionController))
 	{
-		//leftHand->holdingGrabbable = grabComponent
+		hand->holdingGrabbable = grabComponent;
 	}
-}
-
-void AMyVRPlayerController::OnLeftReleaseInput()
-{
-}
-
-void AMyVRPlayerController::OnRightGrabInput()
-{
-}
-
-void AMyVRPlayerController::OnRightReleaseInput()
-{
 }

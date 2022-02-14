@@ -7,7 +7,9 @@
 #include "MyVRHand.generated.h"
 
 class UMotionControllerComponent;
-class UMyGrabComponent;
+class UMyGrabbable;
+class UMyGrabber;
+class UMyGrabbablesProvider;
 
 UCLASS()
 class VR_API AMyVRHand : public AActor
@@ -31,7 +33,12 @@ public:
 		USceneComponent* root;
 	UPROPERTY(VisibleAnywhere)
 		UMotionControllerComponent* motionController;
+	UPROPERTY(VisibleAnywhere)
+		UMyGrabber* grabber;
+	UPROPERTY(VisibleAnywhere)
+		UMyGrabbablesProvider* grabbablesProvider;
+	UPROPERTY(EditAnywhere)
+		float GrabRadiusFromGripPosition = 6.0f;
 
-	float GrabRadiusFromGripPosition = 6.0f;
-	UMyGrabComponent* holdingGrabbable;
+	UMyGrabbable* holdingGrabbable;
 };

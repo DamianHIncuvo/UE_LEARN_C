@@ -24,6 +24,10 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
 
+public:
+	AMyVRHand* leftHand;
+	AMyVRHand* rightHand;
+
 private:
 	void OnRotateAxis(float inputValue);
 	void OnTeleportAxis(float inputValue);
@@ -32,12 +36,11 @@ private:
 	void OnRightGrabInput();
 	void OnRightReleaseInput();
 
+	void OnGrabInput(AMyVRHand* hand);
+
 	InputRotateProcessor* rotateProcessor;
 	InputTeleportProcessor* teleportProcessor;
 
 	UTeleportComponent* teleportComponent;
 	URotateComponent* rotateComponent;
-
-	AMyVRHand* leftHand;
-	AMyVRHand* rightHand;
 };

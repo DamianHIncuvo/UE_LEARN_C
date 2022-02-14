@@ -3,29 +3,29 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SceneComponent.h"
+#include "Components/ActorComponent.h"
 #include "../Enums/MyGrabType.h"
-#include "MyGrabComponent.generated.h"
+#include "MyGrabbable.generated.h"
 
 class UMotionControllerComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabbed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDropped);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class VR_API UMyGrabComponent : public USceneComponent
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class VR_API UMyGrabbable : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UMyGrabComponent();
+	UMyGrabbable();
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	UFUNCTION(BlueprintCallable)
 		bool TryGrab(UMotionControllerComponent* MotionController);
 	UFUNCTION(BlueprintCallable)

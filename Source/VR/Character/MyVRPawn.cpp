@@ -10,6 +10,7 @@
 #include "MotionControllerComponent.h"
 #include "MyVRPlayerController.h"
 #include "../Grabbing/MyVRHand.h"
+#include "../Character/MyVRPlayerController.h"
 
 // Sets default values
 AMyVRPawn::AMyVRPawn()
@@ -46,6 +47,10 @@ void AMyVRPawn::BeginPlay()
 	rightHand->SetOwner(this);
 	rightHand->K2_AttachRootComponentToActor(this);
 	rightHand->motionController->MotionSource = FName("Right");
+
+	playerController = Cast<AMyVRPlayerController>(GetController<AMyVRPlayerController>());
+	playerController->leftHand = leftHand;
+	playerController->rightHand = rightHand;
 
 #if WITH_EDITOR
 	leftHand->motionController->bDisplayDeviceModel = true;

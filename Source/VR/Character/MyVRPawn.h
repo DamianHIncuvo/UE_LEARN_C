@@ -12,6 +12,7 @@ class UTeleportComponent;
 class URotateComponent;
 class UMotionControllerComponent;
 class AMyVRHand;
+class AMyVRPlayerController;
 
 UCLASS()
 class VR_API AMyVRPawn : public APawn
@@ -45,4 +46,7 @@ public:
 		AMyVRHand* leftHand;
 	UPROPERTY(VisibleAnywhere)
 		AMyVRHand* rightHand;
+
+private:
+	AMyVRPlayerController* playerController;
 };
