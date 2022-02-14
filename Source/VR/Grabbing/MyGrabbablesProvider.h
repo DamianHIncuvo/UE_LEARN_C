@@ -7,6 +7,7 @@
 #include "MyGrabbablesProvider.generated.h"
 
 class UMyGrabbable;
+class AMyVRHand;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VR_API UMyGrabbablesProvider : public UActorComponent
@@ -26,4 +27,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UMyGrabbable* GetBestGrabbableToGrab();
+
+private:
+	AMyVRHand* hand;
 };

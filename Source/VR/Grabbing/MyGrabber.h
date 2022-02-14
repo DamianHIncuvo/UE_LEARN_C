@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "MyGrabber.generated.h"
 
+class AMyVRHand;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VR_API UMyGrabber : public UActorComponent
@@ -25,4 +26,15 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void InputGrab();
+	void InputRelease();
+
+private:
+	AMyVRHand* hand;
+
+	void FreeGrab(UMotionControllerComponent* MotionController);
+	void SnapGrab(UMotionControllerComponent* MotionController);
+
+	void SetPrimitiveCompPhysics(bool bSimulate);
+
+	bool AttachParentToMotionController(UMotionControllerComponent* MotionController);
 };

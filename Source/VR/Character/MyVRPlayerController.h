@@ -31,12 +31,6 @@ public:
 private:
 	void OnRotateAxis(float inputValue);
 	void OnTeleportAxis(float inputValue);
-	void OnLeftGrabInput();
-	void OnLeftReleaseInput();
-	void OnRightGrabInput();
-	void OnRightReleaseInput();
-
-	void OnGrabInput(AMyVRHand* hand);
 
 	InputRotateProcessor* rotateProcessor;
 	InputTeleportProcessor* teleportProcessor;

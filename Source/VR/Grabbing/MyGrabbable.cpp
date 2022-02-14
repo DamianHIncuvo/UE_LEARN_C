@@ -39,27 +39,7 @@ void UMyGrabbable::BeginPlay()
 
 bool UMyGrabbable::TryGrab(UMotionControllerComponent* MotionController)
 {
-	switch (GrabType)
-	{
-	case EMyGrabType::None:
-		UE_LOG(LogTemp, Error, TEXT("GrabType is not defined for this grab component."))
-			break;
-	case EMyGrabType::Free:
-		TryFreeGrab(MotionController);
-		break;
-	case EMyGrabType::Snap:
-		TrySnapGrab(MotionController);
-		break;
-	case EMyGrabType::Custom:
-		bIsHeld = true;
-		break;
-	default:
-		UE_LOG(LogTemp, Error, TEXT("Something got fucked up hard."))
-			break;
-	}
-
-	if (bIsHeld == false)
-		return false;
+	// lel OnGrab
 
 	MotionControllerRef = MotionController;
 
