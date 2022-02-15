@@ -10,5 +10,4 @@ enum class EMyGrabType : uint8
     None = 0    UMETA(DisplayName = "None"),
     Snap = 1    UMETA(DisplayName = "Snap"),
     Free = 2    UMETA(DisplayName = "Free"),
-    Custom = 3  UMETA(DisplayName = "Custom")
 };

@@ -38,4 +38,3 @@ void AMyVRHand::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-

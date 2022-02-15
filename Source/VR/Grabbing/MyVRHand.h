@@ -39,6 +39,4 @@ public:
 		UMyGrabbablesProvider* grabbablesProvider;
 	UPROPERTY(EditAnywhere)
 		float GrabRadiusFromGripPosition = 6.0f;
-
-	UMyGrabbable* holdingGrabbable;
 };

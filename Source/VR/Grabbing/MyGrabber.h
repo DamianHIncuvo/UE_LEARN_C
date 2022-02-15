@@ -7,6 +7,8 @@
 #include "MyGrabber.generated.h"
 
 class AMyVRHand;
+class UMotionControllerComponent;
+class UMyGrabbable;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VR_API UMyGrabber : public UActorComponent
@@ -28,13 +30,24 @@ public:
 	void InputGrab();
 	void InputRelease();
 
+	bool IsHoldingGrabbable();
+
+public:
+	UPROPERTY(EditAnywhere)
+		UHapticFeedbackEffect_Base* OnGrabHapticEffect;
+
 private:
 	AMyVRHand* hand;
+	UMyGrabbable* heldGrabbable;
 
-	void FreeGrab(UMotionControllerComponent* MotionController);
-	void SnapGrab(UMotionControllerComponent* MotionController);
+	void FreeGrab(UMyGrabbable* grabbable);
+	void SnapGrab(UMyGrabbable* grabbable);
 
-	void SetPrimitiveCompPhysics(bool bSimulate);
+	void SetPrimitiveCompPhysics(bool bSimulate, UMyGrabbable* grabbable);
 
-	bool AttachParentToMotionController(UMotionControllerComponent* MotionController);
+	void AttachParentToMotionController(UMyGrabbable* grabbable);
+
+	EControllerHand GetHandFromMotionSource(UMotionControllerComponent* MotionController);
+
+	void Release();
 };

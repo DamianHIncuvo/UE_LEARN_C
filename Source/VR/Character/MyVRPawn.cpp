@@ -3,14 +3,16 @@
 
 #include "MyVRPawn.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-#include "../Enums/AxisSide.h"
 #include "Camera/CameraComponent.h"
-#include "../Movement/Teleport/TeleportComponent.h"
-#include "../Movement/Rotating/RotateComponent.h"
 #include "MotionControllerComponent.h"
 #include "MyVRPlayerController.h"
+#include "../Enums/AxisSide.h"
 #include "../Grabbing/MyVRHand.h"
+#include "../Grabbing/MyGrabber.h"
 #include "../Character/MyVRPlayerController.h"
+#include "../Movement/Teleport/TeleportComponent.h"
+#include "../Movement/Rotating/RotateComponent.h"
+#include "Components/ChildActorComponent.h"
 
 // Sets default values
 AMyVRPawn::AMyVRPawn()
@@ -39,18 +41,15 @@ AMyVRPawn::AMyVRPawn()
 void AMyVRPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	leftHand = Cast<AMyVRHand>(GetWorld()->SpawnActor(AMyVRHand::StaticClass()));
 	leftHand->SetOwner(this);
 	leftHand->K2_AttachRootComponentToActor(this);
+
 	rightHand = Cast<AMyVRHand>(GetWorld()->SpawnActor(AMyVRHand::StaticClass()));
 	rightHand->SetOwner(this);
 	rightHand->K2_AttachRootComponentToActor(this);
 	rightHand->motionController->MotionSource = FName("Right");
-
-	playerController = Cast<AMyVRPlayerController>(GetController<AMyVRPlayerController>());
-	playerController->leftHand = leftHand;
-	playerController->rightHand = rightHand;
 
 #if WITH_EDITOR
 	leftHand->motionController->bDisplayDeviceModel = true;
@@ -63,6 +62,26 @@ void AMyVRPawn::BeginPlay()
 	{
 		UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Type::Floor);
 	}
+}
+
+void AMyVRPawn::LeftInputGrab()
+{
+	leftHand->grabber->InputGrab();
+}
+
+void AMyVRPawn::LeftInputRelease()
+{
+	leftHand->grabber->InputRelease();
+}
+
+void AMyVRPawn::RightInputGrab()
+{
+	rightHand->grabber->InputGrab();
+}
+
+void AMyVRPawn::RightInputRelease()
+{
+	rightHand->grabber->InputRelease();
 }
 
 // Called every frame

@@ -24,10 +24,6 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
 
-public:
-	AMyVRHand* leftHand;
-	AMyVRHand* rightHand;
-
 private:
 	void OnRotateAxis(float inputValue);
 	void OnTeleportAxis(float inputValue);

@@ -26,17 +26,17 @@ void AMyVRPlayerController::SetupInputComponent()
 
 void AMyVRPlayerController::BeginPlay()
 {
+	Super::BeginPlay();
+
 	AMyVRPawn* pawn = GetPawn<AMyVRPawn>();
 
 	teleportComponent = pawn->teleportComponent;
 	rotateComponent = pawn->rotateComponent;
-	leftHand = pawn->leftHand;
-	rightHand = pawn->rightHand;
 
-	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Pressed, leftHand->grabber, &UMyGrabber::InputGrab);
-	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Released, leftHand->grabber, &UMyGrabber::InputRelease);
-	InputComponent->BindAction("GrabRight", EInputEvent::IE_Pressed, rightHand->grabber, &UMyGrabber::InputGrab);
-	InputComponent->BindAction("GrabRight", EInputEvent::IE_Released, rightHand->grabber, &UMyGrabber::InputRelease);
+	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Pressed, pawn, &AMyVRPawn::LeftInputGrab);
+	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Released, pawn, &AMyVRPawn::LeftInputRelease);
+	InputComponent->BindAction("GrabRight", EInputEvent::IE_Pressed, pawn, &AMyVRPawn::RightInputGrab);
+	InputComponent->BindAction("GrabRight", EInputEvent::IE_Released, pawn, &AMyVRPawn::RightInputRelease);
 }
 
 void AMyVRPlayerController::OnRotateAxis(float inputValue)

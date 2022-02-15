@@ -13,6 +13,7 @@ class URotateComponent;
 class UMotionControllerComponent;
 class AMyVRHand;
 class AMyVRPlayerController;
+class UChildActorComponent;
 
 UCLASS()
 class VR_API AMyVRPawn : public APawn
@@ -46,7 +47,13 @@ public:
 		AMyVRHand* leftHand;
 	UPROPERTY(VisibleAnywhere)
 		AMyVRHand* rightHand;
+	UPROPERTY(VisibleAnywhere)
+		UChildActorComponent* leftHandChildComponent;
+	UPROPERTY(VisibleAnywhere)
+		UChildActorComponent* rightHandChildComponent;
 
-private:
-	AMyVRPlayerController* playerController;
+	void LeftInputGrab();
+	void LeftInputRelease();
+	void RightInputGrab();
+	void RightInputRelease();
 };

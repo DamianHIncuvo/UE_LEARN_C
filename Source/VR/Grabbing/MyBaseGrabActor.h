@@ -25,11 +25,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
-public:
 	UPROPERTY(EditAnywhere)
 		UStaticMeshComponent* staticMesh;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 		UMyGrabbable* grabComponent;
 };

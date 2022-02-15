@@ -12,7 +12,7 @@ class UMotionControllerComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabbed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDropped);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS()
 class VR_API UMyGrabbable : public UActorComponent
 {
 	GENERATED_BODY()
@@ -27,9 +27,9 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-		bool TryGrab(UMotionControllerComponent* MotionController);
+		void OnGrab(UMotionControllerComponent* MotionController);
 	UFUNCTION(BlueprintCallable)
-		bool TryRelease();
+		void OnRelease();
 
 	UPROPERTY(BlueprintAssignable)
 		FGrabbed OnGrabbed;
@@ -37,29 +37,10 @@ public:
 	UPROPERTY(BlueprintAssignable)
 		FDropped OnDropped;
 
-private:
-
-	void TryFreeGrab(UMotionControllerComponent* MotionController);
-	void TrySnapGrab(UMotionControllerComponent* MotionController);
-
-	void Release();
-
-	EControllerHand GetHandFromMotionSource(UMotionControllerComponent* MotionController);
-
-	void SetPrimitiveCompPhysics(bool bSimulate);
-
-	bool AttachParentToMotionController(UMotionControllerComponent* MotionController);
-
 public:
 	UPROPERTY(EditAnywhere)
 		TEnumAsByte<EMyGrabType> GrabType;
 
-	UPROPERTY(EditAnywhere)
-		UHapticFeedbackEffect_Base* OnGrabHapticEffect;
-
 private:
 	UMotionControllerComponent* MotionControllerRef;
-
-	bool bSimulateOnDrop;
-	bool bIsHeld;
 };

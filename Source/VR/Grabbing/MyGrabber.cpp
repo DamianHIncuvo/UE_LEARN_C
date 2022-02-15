@@ -6,7 +6,6 @@
 #include "MyGrabbablesProvider.h"
 #include "MyGrabbable.h"
 #include "MotionControllerComponent.h"
-#include <Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h>
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
 // Sets default values for this component's properties
@@ -52,76 +51,104 @@ void UMyGrabber::InputGrab()
 	{
 	case EMyGrabType::None:
 		UE_LOG(LogTemp, Error, TEXT("GrabType is not defined for this grab component."))
-			break;
+			return;
 	case EMyGrabType::Free:
-		FreeGrab(MotionController);
+		FreeGrab(grabbable);
 		break;
 	case EMyGrabType::Snap:
-		SnapGrab(MotionController);
-		break;
-	case EMyGrabType::Custom:
-		bIsHeld = true;
+		SnapGrab(grabbable);
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("Something got fucked up hard."))
-			break;
+			return;
 	}
 
-	if (bIsHeld == false)
-		return false;
+	heldGrabbable = grabbable;
 
+	if (IsHoldingGrabbable() == false)
+		return;
 
-	if (grabComponent->TryGrab(hand->motionController))
-	{
-		hand->holdingGrabbable = grabComponent;
-	}
+	heldGrabbable = grabComponent;
+
+	grabComponent->OnGrab(hand->motionController);
+
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->PlayHapticEffect(OnGrabHapticEffect, GetHandFromMotionSource(hand->motionController), 1.0F, false);
 }
 
 void UMyGrabber::InputRelease()
 {
+	if (heldGrabbable == nullptr)
+		return;
+
+	switch (heldGrabbable->GrabType)
+	{
+	case EMyGrabType::None:
+		UE_LOG(LogTemp, Error, TEXT("GrabType is not defined for this grab component."))
+			return;
+	case EMyGrabType::Free:
+	case EMyGrabType::Snap:
+		Release();
+		break;
+	default:
+		UE_LOG(LogTemp, Error, TEXT("Something got fucked up hard."))
+			return;
+	}
+
+	heldGrabbable->OnRelease();
+
+	heldGrabbable = nullptr;
 }
 
-void UMyGrabber::FreeGrab(UMotionControllerComponent* MotionController)
+bool UMyGrabber::IsHoldingGrabbable()
 {
-	SetPrimitiveCompPhysics(false);
-
-	AttachParentToMotionController(MotionController);
+	return heldGrabbable != nullptr;
 }
 
-void UMyGrabber::SnapGrab(UMotionControllerComponent* MotionController)
+void UMyGrabber::FreeGrab(UMyGrabbable* grabbable)
 {
-	SetPrimitiveCompPhysics(false);
+	SetPrimitiveCompPhysics(false, grabbable);
 
-	AttachParentToMotionController(MotionController);
+	AttachParentToMotionController(grabbable);
+}
+
+void UMyGrabber::SnapGrab(UMyGrabbable* grabbable)
+{
+	SetPrimitiveCompPhysics(false, grabbable);
+
+	AttachParentToMotionController(grabbable);
 
 	FHitResult* OutSweepHitResult = nullptr;
 
-	GetOwner()->GetRootComponent()->SetRelativeRotation(GetOwner()->GetRootComponent()->GetRelativeRotation().GetInverse(), false, OutSweepHitResult, ETeleportType::TeleportPhysics);
-	GetOwner()->GetRootComponent()->SetWorldLocation(((GetOwner()->GetRootComponent()->GetComponentLocation() - GetOwner()->GetRootComponent()->GetComponentLocation()) * -1.0F) + MotionController->GetComponentLocation(), false, OutSweepHitResult, ETeleportType::TeleportPhysics);
+	grabbable->GetOwner()->GetRootComponent()->SetRelativeRotation(grabbable->GetOwner()->GetRootComponent()->GetRelativeRotation().GetInverse(), false, OutSweepHitResult, ETeleportType::TeleportPhysics);
+	grabbable->GetOwner()->GetRootComponent()->SetWorldLocation(((grabbable->GetOwner()->GetRootComponent()->GetComponentLocation() - grabbable->GetOwner()->GetRootComponent()->GetComponentLocation()) * -1.0F) + hand->motionController->GetComponentLocation(), false, OutSweepHitResult, ETeleportType::TeleportPhysics);
 }
 
-void UMyGrabber::SetPrimitiveCompPhysics(bool bSimulate)
+void UMyGrabber::SetPrimitiveCompPhysics(bool bSimulate, UMyGrabbable* grabbable)
 {
-	Cast<UPrimitiveComponent>(hand->GetRootComponent())->SetSimulatePhysics(bSimulate);
+	Cast<UPrimitiveComponent>(grabbable->GetOwner()->GetRootComponent())->SetSimulatePhysics(bSimulate);
 }
 
-bool UMyGrabber::AttachParentToMotionController(UMotionControllerComponent* MotionController)
+void UMyGrabber::AttachParentToMotionController(UMyGrabbable* grabbable)
 {
-	// WeŸ mojego parenta, który najwyraŸniej jest moim rootem i przyczem go to kontrolera.
-	bool output = GetOwner()->GetRootComponent()->AttachToComponent(MotionController, FAttachmentTransformRules::KeepWorldTransform, FName(TEXT("None")));
+	grabbable->GetOwner()->GetRootComponent()->AttachToComponent(hand->motionController, FAttachmentTransformRules::KeepWorldTransform, FName(TEXT("None")));
+}
 
-	if (output == false)
+EControllerHand UMyGrabber::GetHandFromMotionSource(UMotionControllerComponent* MotionController)
+{
+	// Uwaga, mam wyjebane na przypadki, gdzie ten string jest ustawiony Ÿle lub wcale, po prostu daj mi praw¹ rêkê. (origynalnie z BP)
+	if (MotionController->MotionSource == FName(TEXT("Left")))
 	{
-		FString warningInfo =
-			TEXT("Attaching") +
-			UKismetSystemLibrary::GetDisplayName(GetOwner()->GetRootComponent()) +
-			TEXT("to") +
-			UKismetSystemLibrary::GetDisplayName(MotionController) +
-			TEXT("FAILED - object not grabbed");
-
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *warningInfo);
+		return EControllerHand::Left;
 	}
-
-	return output;
+	else
+	{
+		return EControllerHand::Right;
+	}
 }
 
+void UMyGrabber::Release()
+{
+	heldGrabbable->GetOwner()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+	SetPrimitiveCompPhysics(true, heldGrabbable);
+}
