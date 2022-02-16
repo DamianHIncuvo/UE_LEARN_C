@@ -4,10 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../Triggerable.h"
 #include "MyBasePistol.generated.h"
 
+class UBaseShooting;
+class UMyGrabbable;
+class USkeletalMeshComponent;
+
 UCLASS()
-class VR_API AMyBasePistol : public AActor
+class VR_API AMyBasePistol : public AActor, public ITriggerable
 {
 	GENERATED_BODY()
 	
@@ -22,4 +27,17 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void Trigger();
+	bool CanTrigger();
+
+public:
+	UPROPERTY(VisibleAnywhere)
+		UBaseShooting* shooting;
+
+	UPROPERTY(VisibleAnywhere)
+		UMyGrabbable* grabComponent;
+
+	UPROPERTY(VisibleAnywhere)
+		USkeletalMeshComponent* skeletalMesh;
 };

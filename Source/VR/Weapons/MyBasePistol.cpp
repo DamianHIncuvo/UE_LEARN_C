@@ -2,13 +2,24 @@
 
 
 #include "MyBasePistol.h"
+#include "../Grabbing/MyGrabbable.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "BaseShooting.h"
 
 // Sets default values
 AMyBasePistol::AMyBasePistol()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
+	skeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>("SkeletalMeshComponent");
+	SetRootComponent(skeletalMesh);
+
+	shooting = CreateDefaultSubobject<UBaseShooting>("BaseShooting");
+	AddOwnedComponent(shooting);
+
+	grabComponent = CreateDefaultSubobject<UMyGrabbable>("GrabComponent");
+	AddOwnedComponent(grabComponent);
 }
 
 // Called when the game starts or when spawned
@@ -23,4 +34,14 @@ void AMyBasePistol::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AMyBasePistol::Trigger()
+{
+	shooting->Shot();
+}
+
+bool AMyBasePistol::CanTrigger()
+{
+	return false;
 }
