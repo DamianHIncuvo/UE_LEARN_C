@@ -14,6 +14,7 @@ class UMotionControllerComponent;
 class AMyVRHand;
 class AMyVRPlayerController;
 class UChildActorComponent;
+class AMyVRHand;
 
 UCLASS()
 class VR_API AMyVRPawn : public APawn
@@ -56,4 +57,9 @@ public:
 	void LeftInputRelease();
 	void RightInputGrab();
 	void RightInputRelease();
+	void LeftTriggerInput();
+	void RightTriggerInput();
+
+private:
+	void TriggerInput(AMyVRHand* hand);
 };

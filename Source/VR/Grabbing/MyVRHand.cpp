@@ -16,7 +16,7 @@ AMyVRHand::AMyVRHand()
 	SetRootComponent(root);
 
 	motionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController"));
-	motionController->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
+	motionController->SetupAttachment(root);
 
 	grabber = CreateDefaultSubobject<UMyGrabber>("Grabber");
 	AddOwnedComponent(grabber);

@@ -41,6 +41,9 @@ public:
 	UPROPERTY(EditAnywhere)
 		TEnumAsByte<EMyGrabType> GrabType;
 
+	UPROPERTY(EditAnywhere)
+		USceneComponent* grabPoint;
+
 private:
 	UMotionControllerComponent* MotionControllerRef;
 };

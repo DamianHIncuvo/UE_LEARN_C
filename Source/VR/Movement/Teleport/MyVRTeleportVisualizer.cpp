@@ -14,13 +14,13 @@ AMyVRTeleportVisualizer::AMyVRTeleportVisualizer()
 	SetRootComponent(rootSceneComponent);
 
 	playArea = CreateDefaultSubobject<UNiagaraComponent>(TEXT("playArea"));
-	playArea->AttachToComponent(rootSceneComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	playArea->SetupAttachment(rootSceneComponent);
 
 	ring = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ring"));
-	ring->AttachToComponent(rootSceneComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	ring->SetupAttachment(rootSceneComponent);
 
 	trace = CreateDefaultSubobject<UNiagaraComponent>(TEXT("trace"));
-	trace->AttachToComponent(rootSceneComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	trace->SetupAttachment(rootSceneComponent);
 }
 
 // Called when the game starts or when spawned

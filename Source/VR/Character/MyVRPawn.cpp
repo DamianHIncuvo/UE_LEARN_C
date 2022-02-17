@@ -9,10 +9,12 @@
 #include "../Enums/AxisSide.h"
 #include "../Grabbing/MyVRHand.h"
 #include "../Grabbing/MyGrabber.h"
+#include "../Grabbing/MyGrabbable.h"
 #include "../Character/MyVRPlayerController.h"
 #include "../Movement/Teleport/TeleportComponent.h"
 #include "../Movement/Rotating/RotateComponent.h"
 #include "Components/ChildActorComponent.h"
+#include "../Triggerable.h"
 
 // Sets default values
 AMyVRPawn::AMyVRPawn()
@@ -24,7 +26,7 @@ AMyVRPawn::AMyVRPawn()
 	SetRootComponent(sceneRootPlayerRoom);
 
 	camera = CreateDefaultSubobject<UCameraComponent>("Camera");
-	camera->AttachToComponent(sceneRootPlayerRoom, FAttachmentTransformRules::KeepWorldTransform);
+	camera->SetupAttachment(sceneRootPlayerRoom);
 
 	rotateComponent = CreateDefaultSubobject<URotateComponent>("RotateComponent");
 	AddOwnedComponent(rotateComponent);
@@ -82,6 +84,47 @@ void AMyVRPawn::RightInputGrab()
 void AMyVRPawn::RightInputRelease()
 {
 	rightHand->grabber->InputRelease();
+}
+
+void AMyVRPawn::LeftTriggerInput()
+{
+	TriggerInput(leftHand);
+}
+
+void AMyVRPawn::RightTriggerInput()
+{
+	TriggerInput(rightHand);
+}
+
+void AMyVRPawn::TriggerInput(AMyVRHand* hand)
+{
+	if (hand->grabber->IsHoldingGrabbable() == false)
+		return;
+
+	UE_LOG(LogTemp, Error, TEXT("Lel"));
+
+	if (hand->grabber->heldGrabbable->GetOwner()->Implements<UTriggerable>() == false)
+		return;
+
+	ITriggerable* iTriggerable = Cast<ITriggerable>(hand->grabber->heldGrabbable->GetOwner());
+
+	UE_LOG(LogTemp, Error, TEXT("Lel"));
+
+	if (iTriggerable == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("O KURWA"));
+	}
+	else
+	{
+		if (iTriggerable->CanTrigger() == false)
+			return;
+
+		UE_LOG(LogTemp, Error, TEXT("Lel"));
+
+		iTriggerable->Trigger();
+
+		UE_LOG(LogTemp, Error, TEXT("Lel"));
+	}
 }
 
 // Called every frame

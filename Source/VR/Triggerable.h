@@ -20,6 +20,6 @@ class ITriggerable
 	GENERATED_BODY()
 
 public:
-	void Trigger();
-	bool CanTrigger();
+	virtual void Trigger();
+	virtual bool CanTrigger();
 };

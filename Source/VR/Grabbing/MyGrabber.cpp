@@ -119,8 +119,8 @@ void UMyGrabber::SnapGrab(UMyGrabbable* grabbable)
 
 	FHitResult* OutSweepHitResult = nullptr;
 
-	grabbable->GetOwner()->GetRootComponent()->SetRelativeRotation(grabbable->GetOwner()->GetRootComponent()->GetRelativeRotation().GetInverse(), false, OutSweepHitResult, ETeleportType::TeleportPhysics);
-	grabbable->GetOwner()->GetRootComponent()->SetWorldLocation(((grabbable->GetOwner()->GetRootComponent()->GetComponentLocation() - grabbable->GetOwner()->GetRootComponent()->GetComponentLocation()) * -1.0F) + hand->motionController->GetComponentLocation(), false, OutSweepHitResult, ETeleportType::TeleportPhysics);
+	grabbable->GetOwner()->GetRootComponent()->SetRelativeRotation(grabbable->grabPoint->GetRelativeRotation().GetInverse(), false, OutSweepHitResult, ETeleportType::TeleportPhysics);
+	grabbable->GetOwner()->GetRootComponent()->SetWorldLocation(hand->motionController->GetComponentLocation() + (grabbable->grabPoint->GetComponentLocation() - grabbable->GetOwner()->GetRootComponent()->GetComponentLocation()) * -1.0f, false, OutSweepHitResult, ETeleportType::TeleportPhysics);
 }
 
 void UMyGrabber::SetPrimitiveCompPhysics(bool bSimulate, UMyGrabbable* grabbable)

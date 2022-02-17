@@ -12,6 +12,9 @@ AMyBaseGrabActor::AMyBaseGrabActor()
 
 	staticMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
 	SetRootComponent(staticMesh);
+
+	grabComponent = CreateDefaultSubobject<UMyGrabbable>("GrabComponent");
+	AddOwnedComponent(grabComponent);
 }
 
 // Called when the game starts or when spawned

@@ -15,11 +15,15 @@ AMyBasePistol::AMyBasePistol()
 	skeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>("SkeletalMeshComponent");
 	SetRootComponent(skeletalMesh);
 
+	grabPoint = CreateDefaultSubobject<USceneComponent>("Grab Point");
+	grabPoint->SetupAttachment(skeletalMesh);
+
 	shooting = CreateDefaultSubobject<UBaseShooting>("BaseShooting");
 	AddOwnedComponent(shooting);
 
 	grabComponent = CreateDefaultSubobject<UMyGrabbable>("GrabComponent");
 	AddOwnedComponent(grabComponent);
+	grabComponent->grabPoint = grabPoint;
 }
 
 // Called when the game starts or when spawned
@@ -43,5 +47,5 @@ void AMyBasePistol::Trigger()
 
 bool AMyBasePistol::CanTrigger()
 {
-	return false;
+	return true;
 }

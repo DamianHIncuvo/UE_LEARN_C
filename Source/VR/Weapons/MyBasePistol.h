@@ -40,4 +40,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 		USkeletalMeshComponent* skeletalMesh;
+
+	UPROPERTY(EditAnywhere)
+		USceneComponent* grabPoint;
 };

@@ -36,9 +36,10 @@ public:
 	UPROPERTY(EditAnywhere)
 		UHapticFeedbackEffect_Base* OnGrabHapticEffect;
 
+	UMyGrabbable* heldGrabbable;
+
 private:
 	AMyVRHand* hand;
-	UMyGrabbable* heldGrabbable;
 
 	void FreeGrab(UMyGrabbable* grabbable);
 	void SnapGrab(UMyGrabbable* grabbable);
