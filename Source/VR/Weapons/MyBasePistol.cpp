@@ -18,8 +18,12 @@ AMyBasePistol::AMyBasePistol()
 	grabPoint = CreateDefaultSubobject<USceneComponent>("Grab Point");
 	grabPoint->SetupAttachment(skeletalMesh);
 
+	muzzleLocation = CreateDefaultSubobject<USceneComponent>("MuzzleLocation");
+	muzzleLocation->SetupAttachment(skeletalMesh);
+
 	shooting = CreateDefaultSubobject<UBaseShooting>("BaseShooting");
 	AddOwnedComponent(shooting);
+	shooting->muzzleLocation = muzzleLocation;
 
 	grabComponent = CreateDefaultSubobject<UMyGrabbable>("GrabComponent");
 	AddOwnedComponent(grabComponent);

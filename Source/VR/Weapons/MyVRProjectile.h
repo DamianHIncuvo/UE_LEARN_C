@@ -7,6 +7,8 @@
 #include "MyVRProjectile.generated.h"
 
 class UProjectileMovementComponent;
+class USphereComponent;
+class UStaticMeshComponent;
 
 UCLASS()
 class VR_API AMyVRProjectile : public AActor
@@ -25,6 +27,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:
+	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnProjectileStop(FHitResult& impactResult);
+
 public:
-	UProjectileMovementComponent* projectileMovement;
+	UPROPERTY(VisibleAnywhere)
+		UProjectileMovementComponent* projectileMovement;
+
+	UPROPERTY(VisibleAnywhere)
+		USphereComponent* sphereCollision;
+
+	UPROPERTY(VisibleAnywhere)
+		UStaticMeshComponent* staticMesh;
 };

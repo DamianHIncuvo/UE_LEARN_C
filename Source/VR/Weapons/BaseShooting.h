@@ -25,4 +25,10 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Shot();
+
+public:
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class AMyVRProjectile> projectileClass;
+
+	USceneComponent* muzzleLocation;
 };

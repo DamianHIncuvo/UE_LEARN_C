@@ -43,4 +43,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		USceneComponent* grabPoint;
+
+	UPROPERTY(EditAnywhere)
+		USceneComponent* muzzleLocation;
 };

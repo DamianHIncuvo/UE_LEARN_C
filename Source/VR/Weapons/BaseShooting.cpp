@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "Kismet/GameplayStatics.h"
+#include "../Weapons/MyVRProjectile.h"
 #include "BaseShooting.h"
 
 // Sets default values for this component's properties
@@ -34,6 +35,13 @@ void UBaseShooting::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 void UBaseShooting::Shot()
 {
-	UE_LOG(LogTemp, Error, TEXT("BAM"));
+	FTransform* projectileTransform = new FTransform(muzzleLocation->GetComponentRotation(), muzzleLocation->GetComponentLocation(), FVector::OneVector);
+
+	FActorSpawnParameters spawnParameters = FActorSpawnParameters();
+	spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::Undefined;
+	spawnParameters.Owner = GetOwner();
+	spawnParameters.Instigator = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+
+	GetWorld()->SpawnActor(projectileClass, projectileTransform, spawnParameters);
 }
 
