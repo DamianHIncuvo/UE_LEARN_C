@@ -15,6 +15,8 @@
 #include "../Movement/Rotating/RotateComponent.h"
 #include "Components/ChildActorComponent.h"
 #include "../Triggerable.h"
+#include "Kismet/GameplayStatics.h"
+#include "../GameLogic/MyBaseMenu.h"
 
 // Sets default values
 AMyVRPawn::AMyVRPawn()
@@ -96,35 +98,49 @@ void AMyVRPawn::RightTriggerInput()
 	TriggerInput(rightHand);
 }
 
+void AMyVRPawn::LeftToggleMenu()
+{
+	ToggleMenu(false);
+}
+
+void AMyVRPawn::RightToggleMenu()
+{
+	ToggleMenu(true);
+}
+
+void AMyVRPawn::ToggleMenu(bool isRightHand)
+{
+	if (menu == nullptr)
+	{
+		FTransform projectileTransform = FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::OneVector);
+
+		menu = GetWorld()->SpawnActorDeferred<AMyBaseMenu>(menuClass, projectileTransform, nullptr, this);
+		menu->isActiveMenuHandRight = isRightHand;
+		menu->FinishSpawning(projectileTransform);
+	}
+	else
+	{
+		menu->Destroy();
+	}
+}
+
 void AMyVRPawn::TriggerInput(AMyVRHand* hand)
 {
 	if (hand->grabber->IsHoldingGrabbable() == false)
 		return;
-
-	UE_LOG(LogTemp, Error, TEXT("Lel"));
 
 	if (hand->grabber->heldGrabbable->GetOwner()->Implements<UTriggerable>() == false)
 		return;
 
 	ITriggerable* iTriggerable = Cast<ITriggerable>(hand->grabber->heldGrabbable->GetOwner());
 
-	UE_LOG(LogTemp, Error, TEXT("Lel"));
-
 	if (iTriggerable == nullptr)
-	{
-		UE_LOG(LogTemp, Error, TEXT("O KURWA"));
-	}
-	else
-	{
-		if (iTriggerable->CanTrigger() == false)
-			return;
+		return;
 
-		UE_LOG(LogTemp, Error, TEXT("Lel"));
+	if (iTriggerable->CanTrigger() == false)
+		return;
 
-		iTriggerable->Trigger();
-
-		UE_LOG(LogTemp, Error, TEXT("Lel"));
-	}
+	iTriggerable->Trigger();
 }
 
 // Called every frame

@@ -45,9 +45,10 @@ void UMyGrabber::InputGrab()
 	if (grabbable == nullptr)
 		return;
 
-	UMyGrabbable* grabComponent = Cast<UMyGrabbable>(grabbable);
+	if (grabbable->IsHolded())
+		grabbable->grabberRef->Release();
 
-	switch (grabComponent->GrabType)
+	switch (grabbable->GrabType)
 	{
 	case EMyGrabType::None:
 		UE_LOG(LogTemp, Error, TEXT("GrabType is not defined for this grab component."))
@@ -68,9 +69,7 @@ void UMyGrabber::InputGrab()
 	if (IsHoldingGrabbable() == false)
 		return;
 
-	heldGrabbable = grabComponent;
-
-	grabComponent->OnGrab(hand->motionController);
+	grabbable->OnGrab(this, hand->motionController);
 
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->PlayHapticEffect(OnGrabHapticEffect, GetHandFromMotionSource(hand->motionController), 1.0F, false);
 }
@@ -93,10 +92,6 @@ void UMyGrabber::InputRelease()
 		UE_LOG(LogTemp, Error, TEXT("Something got fucked up hard."))
 			return;
 	}
-
-	heldGrabbable->OnRelease();
-
-	heldGrabbable = nullptr;
 }
 
 bool UMyGrabber::IsHoldingGrabbable()
@@ -151,4 +146,8 @@ void UMyGrabber::Release()
 	heldGrabbable->GetOwner()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
 	SetPrimitiveCompPhysics(true, heldGrabbable);
+
+	heldGrabbable->OnRelease();
+
+	heldGrabbable = nullptr;
 }

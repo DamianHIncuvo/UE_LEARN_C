@@ -15,6 +15,7 @@ class AMyVRHand;
 class AMyVRPlayerController;
 class UChildActorComponent;
 class AMyVRHand;
+class AMyBaseMenu;
 
 UCLASS()
 class VR_API AMyVRPawn : public APawn
@@ -53,13 +54,21 @@ public:
 	UPROPERTY(VisibleAnywhere)
 		UChildActorComponent* rightHandChildComponent;
 
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class AMyBaseMenu> menuClass;
+
 	void LeftInputGrab();
 	void LeftInputRelease();
 	void RightInputGrab();
 	void RightInputRelease();
 	void LeftTriggerInput();
 	void RightTriggerInput();
+	void LeftToggleMenu();
+	void RightToggleMenu();
 
 private:
 	void TriggerInput(AMyVRHand* hand);
+	void ToggleMenu(bool isRightHand);
+
+	AMyBaseMenu* menu;
 };

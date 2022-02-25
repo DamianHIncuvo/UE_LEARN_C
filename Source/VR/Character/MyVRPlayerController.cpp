@@ -39,6 +39,8 @@ void AMyVRPlayerController::BeginPlay()
 	InputComponent->BindAction("GrabRight", EInputEvent::IE_Released, pawn, &AMyVRPawn::RightInputRelease);
 	InputComponent->BindAction("TriggerLeft", EInputEvent::IE_Pressed, pawn, &AMyVRPawn::LeftTriggerInput);
 	InputComponent->BindAction("TriggerRight", EInputEvent::IE_Released, pawn, &AMyVRPawn::RightTriggerInput);
+	InputComponent->BindAction("MenuToggleLeft", EInputEvent::IE_Released, pawn, &AMyVRPawn::LeftToggleMenu);
+	InputComponent->BindAction("MenuToggleRight", EInputEvent::IE_Released, pawn, &AMyVRPawn::RightToggleMenu);
 }
 
 void AMyVRPlayerController::OnRotateAxis(float inputValue)

@@ -6,6 +6,7 @@
 #include <Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h>
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include "MotionControllerComponent.h"
+#include "MyGrabber.h"
 
 // Sets default values for this component's properties
 UMyGrabbable::UMyGrabbable()
@@ -24,9 +25,10 @@ void UMyGrabbable::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UMyGrabbable::OnGrab(UMotionControllerComponent* MotionController)
+void UMyGrabbable::OnGrab(UMyGrabber* grabber, UMotionControllerComponent* MotionController)
 {
 	MotionControllerRef = MotionController;
+	grabberRef = grabber;
 
 	OnGrabbed.Broadcast();
 }
@@ -36,4 +38,11 @@ void UMyGrabbable::OnRelease()
 	MotionControllerRef = nullptr;
 
 	OnDropped.Broadcast();
+
+	grabberRef = nullptr;
+}
+
+bool UMyGrabbable::IsHolded()
+{
+	return grabberRef != nullptr;
 }

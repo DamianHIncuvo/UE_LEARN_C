@@ -8,6 +8,7 @@
 #include "MyGrabbable.generated.h"
 
 class UMotionControllerComponent;
+class UMyGrabber;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGrabbed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDropped);
@@ -27,9 +28,11 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-		void OnGrab(UMotionControllerComponent* MotionController);
+		void OnGrab(UMyGrabber* grabberRef, UMotionControllerComponent* MotionController);
 	UFUNCTION(BlueprintCallable)
 		void OnRelease();
+
+	bool IsHolded();
 
 	UPROPERTY(BlueprintAssignable)
 		FGrabbed OnGrabbed;
@@ -43,6 +46,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		USceneComponent* grabPoint;
+
+	UMyGrabber* grabberRef;
 
 private:
 	UMotionControllerComponent* MotionControllerRef;
