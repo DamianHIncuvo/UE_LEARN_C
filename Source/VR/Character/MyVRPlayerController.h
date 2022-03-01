@@ -11,6 +11,9 @@ class InputTeleportProcessor;
 class UTeleportComponent;
 class URotateComponent;
 class AMyVRHand;
+class AMyVRPawn;
+class AMyBaseMenu;
+class AMyBaseMenu;
 
 /**
  * 
@@ -20,16 +23,21 @@ class VR_API AMyVRPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class AMyBaseMenu> menuClass;
+
 protected:
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
 
 private:
-	void OnRotateAxis(float inputValue);
-	void OnTeleportAxis(float inputValue);
+	void ToggleMenu(bool isRightHand, AMyVRHand* mainHand, AMyVRHand* otherHand);
+	void LeftToggleMenu();
+	void RightToggleMenu();
 
-	InputRotateProcessor* rotateProcessor;
-	InputTeleportProcessor* teleportProcessor;
+	AMyVRPawn* pawn;
+	AMyBaseMenu* menu;
 
 	UTeleportComponent* teleportComponent;
 	URotateComponent* rotateComponent;

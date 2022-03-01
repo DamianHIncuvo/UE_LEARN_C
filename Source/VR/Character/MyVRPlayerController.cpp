@@ -2,78 +2,62 @@
 
 
 #include "MyVRPlayerController.h"
-#include "../InputProcessors/InputRotateProcessor.h"
-#include "../InputProcessors/InputTeleportProcessor.h"
 #include "../Enums/AxisSide.h"
+#include "../Enums/MenuAnimationStates.h"
 #include "../Movement/Rotating/RotateComponent.h"
 #include "../Movement/Teleport/TeleportComponent.h"
 #include "MyVRPawn.h"
 #include "../Grabbing/MyVRHand.h"
 #include "../Grabbing/MyGrabbable.h"
 #include "../Grabbing/MyGrabber.h"
+#include "../GameLogic/MyBaseMenu.h"
 #include "MotionControllerComponent.h"
 
 void AMyVRPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	rotateProcessor = new InputRotateProcessor(0.75f, 0.5f);
-	InputComponent->BindAxis("RotateAxis", this, &AMyVRPlayerController::OnRotateAxis);
-
-	teleportProcessor = new InputTeleportProcessor(0.75f, 0.5f);
-	InputComponent->BindAxis("TeleportAxis", this, &AMyVRPlayerController::OnTeleportAxis);
+	InputComponent->BindAction("MenuToggleLeft", EInputEvent::IE_Released, this, &AMyVRPlayerController::LeftToggleMenu);
+	InputComponent->BindAction("MenuToggleRight", EInputEvent::IE_Released, this, &AMyVRPlayerController::RightToggleMenu);
 }
 
 void AMyVRPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AMyVRPawn* pawn = GetPawn<AMyVRPawn>();
-
-	teleportComponent = pawn->teleportComponent;
-	rotateComponent = pawn->rotateComponent;
-
-	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Pressed, pawn, &AMyVRPawn::LeftInputGrab);
-	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Released, pawn, &AMyVRPawn::LeftInputRelease);
-	InputComponent->BindAction("GrabRight", EInputEvent::IE_Pressed, pawn, &AMyVRPawn::RightInputGrab);
-	InputComponent->BindAction("GrabRight", EInputEvent::IE_Released, pawn, &AMyVRPawn::RightInputRelease);
-	InputComponent->BindAction("TriggerLeft", EInputEvent::IE_Pressed, pawn, &AMyVRPawn::LeftTriggerInput);
-	InputComponent->BindAction("TriggerRight", EInputEvent::IE_Released, pawn, &AMyVRPawn::RightTriggerInput);
-	InputComponent->BindAction("MenuToggleLeft", EInputEvent::IE_Released, pawn, &AMyVRPawn::LeftToggleMenu);
-	InputComponent->BindAction("MenuToggleRight", EInputEvent::IE_Released, pawn, &AMyVRPawn::RightToggleMenu);
+	pawn = Cast<AMyVRPawn>(GetPawn());
 }
 
-void AMyVRPlayerController::OnRotateAxis(float inputValue)
+void AMyVRPlayerController::LeftToggleMenu()
 {
-	EAxisSide axisSide = rotateProcessor->Update(inputValue);
-
-	if (axisSide == EAxisSide::None)
-		return;
-
-	rotateComponent->SnapTurn(axisSide);
+	ToggleMenu(false, pawn->leftHand, pawn->rightHand);
 }
 
-void AMyVRPlayerController::OnTeleportAxis(float inputValue)
+void AMyVRPlayerController::RightToggleMenu()
 {
-	ETeleportState teleportState = teleportProcessor->Update(inputValue);
+	ToggleMenu(true, pawn->rightHand, pawn->leftHand);
+}
 
-	if (teleportState == ETeleportState::None)
+void AMyVRPlayerController::ToggleMenu(bool isRightHand, AMyVRHand* mainHand, AMyVRHand* otherHand)
+{
+	if (menu == nullptr)
 	{
-		return;
+		FTransform projectileTransform = FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::OneVector);
+
+		menu = GetWorld()->SpawnActorDeferred<AMyBaseMenu>(menuClass, projectileTransform, nullptr, pawn);
+		menu->isActiveMenuHandRight = isRightHand;
+		menu->widgetInteractionMain = mainHand->widgetInteraction;
+		menu->widgetInteractionOther = otherHand->widgetInteraction;
+		menu->motionControllerRef = mainHand->motionController;
+		menu->FinishSpawning(projectileTransform);
+
+		pawn->DisableInput(this);
 	}
-
-	switch (teleportState)
+	else
 	{
-	case ETeleportState::Trace:
-		teleportComponent->TeleportTrace();
-		break;
-	case ETeleportState::Teleport:
-		teleportComponent->EndTeleportTrace();
-		if (teleportComponent->CanTeleport()) teleportComponent->Teleport();
-		break;
-	case ETeleportState::Activate:
-		teleportComponent->StartTeleportTrace();
-		teleportComponent->TeleportTrace();
-		break;
+		menu->ChangeState(EMenuAnimationStates::Hiding);
+		menu = nullptr;
+
+		pawn->EnableInput(this);
 	}
 }

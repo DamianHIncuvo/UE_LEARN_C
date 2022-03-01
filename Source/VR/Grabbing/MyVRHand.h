@@ -10,6 +10,7 @@ class UMotionControllerComponent;
 class UMyGrabbable;
 class UMyGrabber;
 class UMyGrabbablesProvider;
+class UWidgetInteractionComponent;
 
 UCLASS()
 class VR_API AMyVRHand : public AActor
@@ -39,4 +40,6 @@ public:
 		UMyGrabbablesProvider* grabbablesProvider;
 	UPROPERTY(EditAnywhere)
 		float GrabRadiusFromGripPosition = 6.0f;
+	UPROPERTY(VisibleAnywhere)
+		UWidgetInteractionComponent* widgetInteraction;
 };

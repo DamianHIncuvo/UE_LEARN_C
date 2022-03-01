@@ -6,7 +6,7 @@
 #include "MyGrabbablesProvider.h"
 #include "MyGrabbable.h"
 #include "MotionControllerComponent.h"
-#include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UMyGrabber::UMyGrabber()

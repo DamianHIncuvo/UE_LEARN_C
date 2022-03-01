@@ -5,6 +5,7 @@
 #include "../Grabbing/MyGrabber.h"
 #include "../Grabbing/MyGrabbablesProvider.h"
 #include "MotionControllerComponent.h"
+#include "Components/WidgetInteractionComponent.h"
 
 // Sets default values
 AMyVRHand::AMyVRHand()
@@ -23,6 +24,10 @@ AMyVRHand::AMyVRHand()
 
 	grabbablesProvider = CreateDefaultSubobject<UMyGrabbablesProvider>("GrabbablesProvider");
 	AddOwnedComponent(grabbablesProvider);
+
+	widgetInteraction = CreateDefaultSubobject<UWidgetInteractionComponent>("Widget");
+	widgetInteraction->SetupAttachment(motionController);
+	widgetInteraction->TraceChannel = ECollisionChannel::ECC_GameTraceChannel1;
 }
 
 // Called when the game starts or when spawned

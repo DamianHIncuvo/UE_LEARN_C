@@ -6,16 +6,19 @@
 #include "Camera/CameraComponent.h"
 #include "MotionControllerComponent.h"
 #include "MyVRPlayerController.h"
+#include "Components/ChildActorComponent.h"
+#include "Components/WidgetInteractionComponent.h"
 #include "../Enums/AxisSide.h"
+#include "../Enums/MenuAnimationStates.h"
 #include "../Grabbing/MyVRHand.h"
 #include "../Grabbing/MyGrabber.h"
 #include "../Grabbing/MyGrabbable.h"
 #include "../Character/MyVRPlayerController.h"
 #include "../Movement/Teleport/TeleportComponent.h"
 #include "../Movement/Rotating/RotateComponent.h"
-#include "Components/ChildActorComponent.h"
+#include "../InputProcessors/InputRotateProcessor.h"
+#include "../InputProcessors/InputTeleportProcessor.h"
 #include "../Triggerable.h"
-#include "Kismet/GameplayStatics.h"
 #include "../GameLogic/MyBaseMenu.h"
 
 // Sets default values
@@ -98,32 +101,6 @@ void AMyVRPawn::RightTriggerInput()
 	TriggerInput(rightHand);
 }
 
-void AMyVRPawn::LeftToggleMenu()
-{
-	ToggleMenu(false);
-}
-
-void AMyVRPawn::RightToggleMenu()
-{
-	ToggleMenu(true);
-}
-
-void AMyVRPawn::ToggleMenu(bool isRightHand)
-{
-	if (menu == nullptr)
-	{
-		FTransform projectileTransform = FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::OneVector);
-
-		menu = GetWorld()->SpawnActorDeferred<AMyBaseMenu>(menuClass, projectileTransform, nullptr, this);
-		menu->isActiveMenuHandRight = isRightHand;
-		menu->FinishSpawning(projectileTransform);
-	}
-	else
-	{
-		menu->Destroy();
-	}
-}
-
 void AMyVRPawn::TriggerInput(AMyVRHand* hand)
 {
 	if (hand->grabber->IsHoldingGrabbable() == false)
@@ -143,8 +120,61 @@ void AMyVRPawn::TriggerInput(AMyVRHand* hand)
 	iTriggerable->Trigger();
 }
 
+void AMyVRPawn::OnRotateAxis(float inputValue)
+{
+	EAxisSide axisSide = rotateProcessor->Update(inputValue);
+
+	if (axisSide == EAxisSide::None)
+		return;
+
+	rotateComponent->SnapTurn(axisSide);
+}
+
+void AMyVRPawn::OnTeleportAxis(float inputValue)
+{
+	ETeleportState teleportState = teleportProcessor->Update(inputValue);
+
+	if (teleportState == ETeleportState::None)
+	{
+		return;
+	}
+
+	switch (teleportState)
+	{
+		case ETeleportState::Trace:
+			teleportComponent->TeleportTrace();
+			break;
+		case ETeleportState::Teleport:
+			teleportComponent->EndTeleportTrace();
+			if (teleportComponent->CanTeleport()) teleportComponent->Teleport();
+			break;
+		case ETeleportState::Activate:
+			teleportComponent->StartTeleportTrace();
+			teleportComponent->TeleportTrace();
+			break;
+	}
+}
+
 // Called every frame
 void AMyVRPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AMyVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Pressed, this, &AMyVRPawn::LeftInputGrab);
+	InputComponent->BindAction("GrabLeft", EInputEvent::IE_Released, this, &AMyVRPawn::LeftInputRelease);
+	InputComponent->BindAction("GrabRight", EInputEvent::IE_Pressed, this, &AMyVRPawn::RightInputGrab);
+	InputComponent->BindAction("GrabRight", EInputEvent::IE_Released, this, &AMyVRPawn::RightInputRelease);
+	InputComponent->BindAction("TriggerLeft", EInputEvent::IE_Pressed, this, &AMyVRPawn::LeftTriggerInput);
+	InputComponent->BindAction("TriggerRight", EInputEvent::IE_Pressed, this, &AMyVRPawn::RightTriggerInput);
+
+	rotateProcessor = new InputRotateProcessor(0.75f, 0.5f);
+	InputComponent->BindAxis("RotateAxis", this, &AMyVRPawn::OnRotateAxis);
+
+	teleportProcessor = new InputTeleportProcessor(0.75f, 0.5f);
+	InputComponent->BindAxis("TeleportAxis", this, &AMyVRPawn::OnTeleportAxis);
 }

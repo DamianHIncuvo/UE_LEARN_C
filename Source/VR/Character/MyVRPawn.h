@@ -16,6 +16,9 @@ class AMyVRPlayerController;
 class UChildActorComponent;
 class AMyVRHand;
 class AMyBaseMenu;
+class UInputComponent;
+class InputRotateProcessor;
+class InputTeleportProcessor;
 
 UCLASS()
 class VR_API AMyVRPawn : public APawn
@@ -28,6 +31,7 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -44,18 +48,10 @@ public:
 		UTeleportComponent* teleportComponent;
 	UPROPERTY(VisibleAnywhere)
 		URotateComponent* rotateComponent;
-
-	UPROPERTY(VisibleAnywhere)
-		AMyVRHand* leftHand;
-	UPROPERTY(VisibleAnywhere)
-		AMyVRHand* rightHand;
 	UPROPERTY(VisibleAnywhere)
 		UChildActorComponent* leftHandChildComponent;
 	UPROPERTY(VisibleAnywhere)
 		UChildActorComponent* rightHandChildComponent;
-
-	UPROPERTY(EditAnywhere)
-		TSubclassOf<class AMyBaseMenu> menuClass;
 
 	void LeftInputGrab();
 	void LeftInputRelease();
@@ -63,12 +59,15 @@ public:
 	void RightInputRelease();
 	void LeftTriggerInput();
 	void RightTriggerInput();
-	void LeftToggleMenu();
-	void RightToggleMenu();
+
+	AMyVRHand* leftHand;
+	AMyVRHand* rightHand;
 
 private:
 	void TriggerInput(AMyVRHand* hand);
-	void ToggleMenu(bool isRightHand);
+	void OnRotateAxis(float inputValue);
+	void OnTeleportAxis(float inputValue);
 
-	AMyBaseMenu* menu;
+	InputRotateProcessor* rotateProcessor;
+	InputTeleportProcessor* teleportProcessor;
 };
